@@ -14,14 +14,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: white;
+  min-height: 20vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: black;
 }
 
 .App-link {
@@ -34,5 +34,97 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+
+/* CSS for BookList Layout */
+
+/* Container styling */
+.book-list-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Table styling */
+.book-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.book-table th, .book-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.book-table th {
+  background-color: #f2f2f2;
+}
+
+/* Header styling */
+.book-list-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Search container styling */
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-container input[type="text"], .search-container select {
+  padding: 5px;
+  margin-right: 10px;
+}
+
+.search-container button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Responsive Styles for Specific Devices */
+@media only screen and (max-width: 600px) {
+  /* Styles for phones */
+  .search-container {
+      flex-wrap: wrap;
+  }
+
+  .search-container input {
+      flex: 1 1 100%;
+      margin-bottom: 10px;
+  }
+
+  .search-container button {
+      flex: 1 1 100%;
+      margin-top: 10px;
+  }
+
+  .book-table th, .book-table td {
+      padding: 6px;
+  }
+}
+
+@media only screen and (min-width: 601px) and (max-width: 1024px) {
+  /* Styles for tablets */
+  .search-container {
+      justify-content: center;
+  }
+}
+
+@media only screen and (min-width: 1025px) {
+  /* Styles for desktops */
+  .search-container {
+      justify-content: flex-end;
+  }
+
+  .book-table th, .book-table td {
+      padding: 10px;
   }
 }
