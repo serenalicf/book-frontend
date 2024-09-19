@@ -8,7 +8,6 @@ function App() {
     <div>
       <header className="App-header">
         <p>Book Inventory</p>
-
       </header>
     <Router>
       <Routes>
