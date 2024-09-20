@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Form, Button, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../BookList.css';
 
 const BookList = () => {
     const [books, setBooks] = useState([]);
@@ -15,6 +16,10 @@ const BookList = () => {
         fromPublicationDate: '',
         toPublicationDate: ''
     });
+
+    const [sortKey, setSortKey] = useState('title');
+    const [sortOrder, setSortOrder] = useState('asc');
+
 
     const fetchBooks = useCallback(async () => {
         try {
@@ -55,9 +60,9 @@ const BookList = () => {
         }));
     };
 
-    const handleSearch = () => {
-        fetchBooks();
-    };
+    // const handleSearch = () => {
+    //     fetchBooks();
+    // };
 
     const handleExport = async () => {
         try {
@@ -73,50 +78,99 @@ const BookList = () => {
         }
     };
 
+    const handleSort = (key) => {
+        if (sortKey === key) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortKey(key);
+            setSortOrder('asc');
+        }
+    };
+
+    const sortedBooks = currentBooks.sort((a, b) => {
+        let comparison = 0;
+        if (a[sortKey] > b[sortKey]) {
+            comparison = 1;
+        } else if (a[sortKey] < b[sortKey]) {
+            comparison = -1;
+        }
+        return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+
     return (
         <div>
             <div className="search-container">
-                <Form>
+            <Form>
+            <div className="row">
+                <div className="col-md-4">
                     <Form.Group controlId="title">
                         <Form.Label>Title:</Form.Label>
                         <Form.Control type="text" name="title" value={filters.title} onChange={handleFilterChange} placeholder="Title" />
                     </Form.Group>
+                </div>
+                <div className="col-md-4">
                     <Form.Group controlId="author">
                         <Form.Label>Author:</Form.Label>
                         <Form.Control type="text" name="author" value={filters.author} onChange={handleFilterChange} placeholder="Author" />
                     </Form.Group>
+                </div>
+    
+                <div className="col-md-4">
                     <Form.Group controlId="genre">
                         <Form.Label>Genre:</Form.Label>
                         <Form.Control type="text" name="genre" value={filters.genre} onChange={handleFilterChange} placeholder="Genre" />
                     </Form.Group>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-md-4">
                     <Form.Group controlId="isbn">
                         <Form.Label>ISBN:</Form.Label>
                         <Form.Control type="text" name="isbn" value={filters.isbn} onChange={handleFilterChange} placeholder="ISBN" />
                     </Form.Group>
+                </div>
+                <div className="col-md-4">
                     <Form.Group controlId="fromPublicationDate">
                         <Form.Label>From Publication Date:</Form.Label>
                         <Form.Control type="date" name="fromPublicationDate" value={filters.fromPublicationDate} onChange={handleFilterChange} placeholder="From Publication Date" />
                     </Form.Group>
+                </div>
+                <div className="col-md-4">
                     <Form.Group controlId="toPublicationDate">
                         <Form.Label>To Publication Date:</Form.Label>
                         <Form.Control type="date" name="toPublicationDate" value={filters.toPublicationDate} onChange={handleFilterChange} placeholder="To Publication Date" />
                     </Form.Group>
-                </Form>
-                <Button onClick={handleExport}>Export Books as CSV</Button>
+                </div>
             </div>
+        </Form>
+        
+        <Button onClick={handleExport} className="export-button">Export Books</Button>
 
+        </div>
             <Table striped bordered hover>
+                {/* Sorting controls */}
                 <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Genre</th>
-                        <th>ISBN</th>
-                        <th>Publication Date</th>
+                <tr>
+                    <th onClick={() => handleSort('title')}>
+                        Title {sortKey === 'title' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                    </th>
+                    <th onClick={() => handleSort('author')}>
+                        Author {sortKey === 'author' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                    </th>
+                    <th onClick={() => handleSort('genre')}>
+                        Genre {sortKey === 'genre' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                    </th>
+                    <th onClick={() => handleSort('isbn')}>
+                        ISBN {sortKey === 'isbn' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                    </th>
+                    <th onClick={() => handleSort('publicationDate')}>
+                        Publication Date {sortKey === 'publicationDate' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                    </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentBooks.map(book => (
+                    {sortedBooks.map(book => (
                         <tr key={book.entryId}>
                             <td>{book.title}</td>
                             <td>{book.author}</td>

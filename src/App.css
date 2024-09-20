@@ -38,56 +38,6 @@
 }
 
 
-/* CSS for BookList Layout */
-
-/* Container styling */
-.book-list-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* Table styling */
-.book-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.book-table th, .book-table td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: left;
-}
-
-.book-table th {
-  background-color: #f2f2f2;
-}
-
-/* Header styling */
-.book-list-header {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-/* Search container styling */
-.search-container {
-  margin-bottom: 20px;
-}
-
-.search-container input[type="text"], .search-container select {
-  padding: 5px;
-  margin-right: 10px;
-}
-
-.search-container button {
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
 
 /* Responsive Styles for Specific Devices */
 @media only screen and (max-width: 600px) {

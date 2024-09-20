@@ -1,0 +1,19 @@
+.search-container {
+    padding: 20px;
+}
+
+.search-container Form.Group {
+    margin-bottom: 15px;
+}
+
+.search-container Form.Control {
+    width: 100%;
+}
+
+.search-container Button {
+    margin-top: 10px;
+}
+
+.export-button {
+    margin-top: 10px;
+}

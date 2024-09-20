@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import '../CreateBookForm.css';
 
 const CreateBookForm = () => {
     const [title, setTitle] = useState('');
@@ -35,13 +37,10 @@ const CreateBookForm = () => {
             }
         } catch (error) {
             if (error.response) {
-                // Server responded with a status other than 200 range
                 setMessage(`Error: ${error.response.data}`);
             } else if (error.request) {
-                // Request was made but no response was received
                 setMessage('Error: No response received from the server.');
             } else {
-                // Something happened in setting up the request that triggered an error
                 setMessage(`Error: ${error.message}`);
             }
             console.error('There was an error creating the book!', error);
@@ -49,62 +48,64 @@ const CreateBookForm = () => {
     };
 
     return (
-        <div className="form-container">
+        <div className="form-container" style={{ padding: '20px' }}>
             <h2>Create Book</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="title">Title:</label>
-                    <input 
+            <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="title">
+                    <Form.Label>Title:</Form.Label>
+                    <Form.Control
                         type="text"
-                        id="title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
+                        className="form-input"
                     />
-                </div>
-                <div>
-                    <label htmlFor="author">Author:</label>
-                    <input 
+                </Form.Group>
+                <Form.Group controlId="author">
+                    <Form.Label>Author:</Form.Label>
+                    <Form.Control
                         type="text"
-                        id="author"
                         value={author}
                         onChange={(e) => setAuthor(e.target.value)}
                         required
+                        className="form-input"
                     />
-                </div>
-                <div>
-                    <label htmlFor="genre">Genre:</label>
-                    <input 
+                </Form.Group>
+                <Form.Group controlId="genre">
+                    <Form.Label>Genre:</Form.Label>
+                    <Form.Control
                         type="text"
-                        id="genre"
                         value={genre}
                         onChange={(e) => setGenre(e.target.value)}
                         required
+                        className="form-input"
                     />
-                </div>
-                <div>
-                    <label htmlFor="isbn">ISBN:</label>
-                    <input 
+                </Form.Group>
+                <Form.Group controlId="isbn">
+                    <Form.Label>ISBN:</Form.Label>
+                    <Form.Control
                         type="text"
-                        id="isbn"
                         value={isbn}
                         onChange={(e) => setIsbn(e.target.value)}
                         required
+                        className="form-input"
                     />
-                </div>
-                <div>
-                    <label htmlFor="publicationDate">Publication Date:</label>
-                    <input 
+                </Form.Group>
+                <Form.Group controlId="publicationDate">
+                    <Form.Label>Publication Date:</Form.Label>
+                    <Form.Control
                         type="date"
-                        id="publicationDate"
                         value={publicationDate}
                         onChange={(e) => setPublicationDate(e.target.value)}
                         required
+                        className="form-input"
                     />
-                </div>
-                <button type="submit">Create Book</button>
-            </form>
-            {message && <p>{message}</p>}
+                </Form.Group>
+                <Button variant="primary" type="submit" className="submit-button">
+                    Create Book
+                </Button>
+            </Form>
+            {message && <Alert variant="success">{message}</Alert>}
         </div>
     );
 };
