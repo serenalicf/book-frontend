@@ -17,3 +17,11 @@
 .export-button {
     margin-top: 10px;
 }
+
+.customDropdown {
+    width: 50px; /* Adjust the width as needed */
+}
+
+.indentLabel {
+    padding-right: 20px; /* Adjust the padding as needed for the desired indentation */
+}
