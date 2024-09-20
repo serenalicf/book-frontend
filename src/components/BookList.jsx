@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { Form, Button, Table } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const BookList = () => {
     const [books, setBooks] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [booksPerPage] = useState(5); // Number of books to display per page
     const [filters, setFilters] = useState({
         title: '',
         author: '',
@@ -14,14 +18,13 @@ const BookList = () => {
 
     const fetchBooks = useCallback(async () => {
         try {
-            // Filter out fields with empty values
             const filteredParams = Object.fromEntries(
                 Object.entries(filters).filter(([key, value]) => value !== '')
             );
     
             const response = await axios.get('http://localhost:8083/books', { params: filteredParams });
-            setBooks(response.data);
-            console.log('Response data: ============', response.data);
+            setBooks(response.data.content);
+            console.log('Response data:', response.data);
         } catch (error) {
             console.error('Error fetching books:', error);
         }
@@ -34,7 +37,15 @@ const BookList = () => {
 
         fetchData();
 
-    }, [fetchBooks]); // Include fetchBooks in the dependency array
+    }, [fetchBooks]);
+
+    const handlePagination = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const indexOfLastBook = currentPage * booksPerPage;
+    const indexOfFirstBook = indexOfLastBook - booksPerPage;
+    const currentBooks = Array.isArray(books) ? books.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage) : [];
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -48,10 +59,8 @@ const BookList = () => {
         fetchBooks();
     };
 
-
     const handleExport = async () => {
         try {
-            console.log("======== " + process.env.REACT_APP_URL + '/books/export')
             const response = await axios.get('http://localhost:8083/books/export', { params: filters, responseType: 'blob' });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -67,22 +76,36 @@ const BookList = () => {
     return (
         <div>
             <div className="search-container">
-                <label htmlFor="title">Title: </label>
-                <input type="text" name="title" value={filters.title} onChange={handleFilterChange} placeholder="Title" label="Title" />
-                <label htmlFor="author">Author: </label>
-                <input type="text" name="author" value={filters.author} onChange={handleFilterChange} placeholder="Author" />
-                <label htmlFor="genre">Genre: </label>
-                <input type="text" name="genre" value={filters.genre} onChange={handleFilterChange} placeholder="Genre" />
-                <label htmlFor="isbn">ISBN: </label>
-                <input type="text" name="isbn" value={filters.isbn} onChange={handleFilterChange} placeholder="ISBN" />
-                <label htmlFor="fromPublicationDate">From Publication Date: </label>
-                <input type="date" name="fromPublicationDate" value={filters.fromPublicationDate} onChange={handleFilterChange} placeholder="From Publication Date" />
-                <label htmlFor="toPublicationDate">To Publication Date: </label>
-                <input type="date" name="toPublicationDate" value={filters.toPublicationDate} onChange={handleFilterChange} placeholder="To Publication Date" />
-                <button onClick={handleExport}>Export Books as CSV</button>
+                <Form>
+                    <Form.Group controlId="title">
+                        <Form.Label>Title:</Form.Label>
+                        <Form.Control type="text" name="title" value={filters.title} onChange={handleFilterChange} placeholder="Title" />
+                    </Form.Group>
+                    <Form.Group controlId="author">
+                        <Form.Label>Author:</Form.Label>
+                        <Form.Control type="text" name="author" value={filters.author} onChange={handleFilterChange} placeholder="Author" />
+                    </Form.Group>
+                    <Form.Group controlId="genre">
+                        <Form.Label>Genre:</Form.Label>
+                        <Form.Control type="text" name="genre" value={filters.genre} onChange={handleFilterChange} placeholder="Genre" />
+                    </Form.Group>
+                    <Form.Group controlId="isbn">
+                        <Form.Label>ISBN:</Form.Label>
+                        <Form.Control type="text" name="isbn" value={filters.isbn} onChange={handleFilterChange} placeholder="ISBN" />
+                    </Form.Group>
+                    <Form.Group controlId="fromPublicationDate">
+                        <Form.Label>From Publication Date:</Form.Label>
+                        <Form.Control type="date" name="fromPublicationDate" value={filters.fromPublicationDate} onChange={handleFilterChange} placeholder="From Publication Date" />
+                    </Form.Group>
+                    <Form.Group controlId="toPublicationDate">
+                        <Form.Label>To Publication Date:</Form.Label>
+                        <Form.Control type="date" name="toPublicationDate" value={filters.toPublicationDate} onChange={handleFilterChange} placeholder="To Publication Date" />
+                    </Form.Group>
+                </Form>
+                <Button onClick={handleExport}>Export Books as CSV</Button>
             </div>
 
-            <table className="book-table">
+            <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>Title</th>
@@ -93,8 +116,8 @@ const BookList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {books.map(book => (
-                        <tr key={book.id}>
+                    {currentBooks.map(book => (
+                        <tr key={book.entryId}>
                             <td>{book.title}</td>
                             <td>{book.author}</td>
                             <td>{book.genre}</td>
@@ -103,7 +126,20 @@ const BookList = () => {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
+
+            {/* Pagination controls */}
+            <div>
+                {books.length > booksPerPage && (
+                    <div>
+                        {Array.from({ length: Math.ceil(books.length / booksPerPage) }, (_, index) => (
+                            <Button key={index} onClick={() => handlePagination(index + 1)}>
+                                {index + 1}
+                            </Button>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
