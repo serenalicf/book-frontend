@@ -10,9 +10,15 @@ const CreateBookForm = () => {
     const [isbn, setIsbn] = useState('');
     const [publicationDate, setPublicationDate] = useState('');
     const [message, setMessage] = useState('');
+    const [isbnError, setIsbnError] = useState('');
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (isbn.length !== 10 && isbn.length !== 13) {
+            setIsbnError('ISBN must be either 10 or 13 characters long.');
+            return;
+        }
 
         try {
             const response = await axios.post('http://localhost:8083/books', {
@@ -34,6 +40,7 @@ const CreateBookForm = () => {
                 setGenre('');
                 setIsbn('');
                 setPublicationDate('');
+                setIsbnError('');
             }
         } catch (error) {
             if (error.response) {
@@ -86,10 +93,14 @@ const CreateBookForm = () => {
                     <Form.Control
                         type="text"
                         value={isbn}
-                        onChange={(e) => setIsbn(e.target.value)}
+                        onChange={(e) => {
+                            setIsbn(e.target.value);
+                            setIsbnError('');
+                        }}
                         required
                         className="form-input"
                     />
+                    {isbnError && <Alert variant="danger">{isbnError}</Alert>}
                 </Form.Group>
                 <Form.Group controlId="publicationDate">
                     <Form.Label>Publication Date:</Form.Label>
