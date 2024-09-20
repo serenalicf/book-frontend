@@ -7,8 +7,8 @@ import '../BookList.css';
 const BookList = () => {
     const [books, setBooks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [booksPerPage, setBooksPerPage] = useState(5);
-    const availableBooksPerPage = [5, 10, 15]; // Define available options for records per page
+    const [booksPerPage, setBooksPerPage] = useState(10);
+    const availableBooksPerPage = [10, 30, 50]; // Define available options for records per page
 
     const [filters, setFilters] = useState({
         title: '',
@@ -55,8 +55,8 @@ const BookList = () => {
         setCurrentPage(pageNumber);
     };
 
-    const indexOfLastBook = currentPage * booksPerPage;
-    const indexOfFirstBook = indexOfLastBook - booksPerPage;
+    //const indexOfLastBook = currentPage * booksPerPage;
+    //const indexOfFirstBook = indexOfLastBook - booksPerPage;
     const currentBooks = Array.isArray(books) ? books.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage) : [];
 
     const handleFilterChange = (e) => {
@@ -109,7 +109,7 @@ const BookList = () => {
         <div style={{ padding: '20px' }}>
             <h2>Search Book</h2>
 
-            <Table>
+            <Table className='tableContainer'>
 
                 <tr>
                     <div className="search-container">
@@ -161,21 +161,19 @@ const BookList = () => {
 
                 </tr>
                 <tr>
-                    <th>
+                    <td>
                         <Button onClick={handleExport} className="export-button">Export Books</Button>
-                    </th>
-
-                    <th className='indentLabel'>
+                    </td>
+                    <td>
                         <Form.Group controlId="booksPerPageSelect">
-                            <Form.Label >View</Form.Label>
-                            <Form.Control as="select" value={booksPerPage} onChange={handleBooksPerPageChange} className="customDropdown">
+                            <Form.Label htmlFor="booksPerPageSelect">View</Form.Label>
+                            <Form.Control as="select" value={booksPerPage} onChange={handleBooksPerPageChange} className="customDropdown" id="booksPerPageSelect">
                                 {availableBooksPerPage.map(option => (
                                     <option key={option} value={option}>{option}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
-                    </th>
-
+                    </td>
                 </tr>
                 <tr>
                     <Table striped bordered hover>
