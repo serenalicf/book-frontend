@@ -88,6 +88,7 @@ const CreateBookForm = () => {
                         className="form-input"
                     />
                 </Form.Group>
+                
                 <Form.Group controlId="isbn">
                     <Form.Label>ISBN:</Form.Label>
                     <Form.Control
@@ -97,11 +98,13 @@ const CreateBookForm = () => {
                             setIsbn(e.target.value);
                             setIsbnError('');
                         }}
+                        isInvalid={!!isbnError}
                         required
                         className="form-input"
                     />
-                    {isbnError && <Alert variant="danger">{isbnError}</Alert>}
+                    <Form.Control.Feedback type="invalid">{isbnError}</Form.Control.Feedback>
                 </Form.Group>
+
                 <Form.Group controlId="publicationDate">
                     <Form.Label>Publication Date:</Form.Label>
                     <Form.Control
