@@ -12,13 +12,15 @@ const CreateBookForm = () => {
     const [message, setMessage] = useState('');
     //const [isbnError, setIsbnError] = useState('');
 
+    const apiHost = 'http://localhost:8083';
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         setMessage('');
 
         try {
-            const response = await axios.post('http://localhost:8083/books', {
+            const response = await axios.post(`${apiHost}/books`, {
                 title,
                 author,
                 genre,
@@ -49,8 +51,8 @@ const CreateBookForm = () => {
                 }).join('\n'); // Separate messages by newline character
 
                 setMessage(`Errors:\n${errorMessages}`);
-            
-            
+
+
             } else if (error.response) {
                 setMessage(`Error: ${error.response.data}`);
             } else if (error.request) {
@@ -133,7 +135,7 @@ const CreateBookForm = () => {
                     ))}
                 </Alert>
             )}
-       
+
         </div>
     );
 };

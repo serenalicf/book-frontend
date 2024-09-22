@@ -24,6 +24,7 @@ const BookList = () => {
     const [sortKey, setSortKey] = useState('entryId');
     const [sortOrder, setSortOrder] = useState('asc');
 
+    const apiHost = 'http://localhost:8083';
 
     const fetchBooks = useCallback(async () => {
         try {
@@ -31,10 +32,9 @@ const BookList = () => {
                 Object.entries(filters).filter(([key, value]) => value !== '')
             );
 
-            const response = await axios.get('http://localhost:8083/books', { params: filteredParams });
+            const response = await axios.get(`${apiHost}/books`, { params: filteredParams });
             setBooks(response.data.content);
             setTotalPages(response.data.totalPages);
-            console.log('Response data:', response.data);
         } catch (error) {
             console.error('Error fetching books:', error);
         }
@@ -44,9 +44,9 @@ const BookList = () => {
         const fetchData = async () => {
             await fetchBooks();
         };
-    
+
         fetchData();
-    
+
     }, [fetchBooks, filters]);
 
     const handlePagination = (page) => {
@@ -71,14 +71,14 @@ const BookList = () => {
         setFilters((prevFilters) => ({
             ...prevFilters,
             pageSize: newSize,
-            pageNo:0
+            pageNo: 0
         }));
         setCurrentPage(1);
     };
 
     const handleExport = async () => {
         try {
-            const response = await axios.get('http://localhost:8083/books/export', { params: filters, responseType: 'blob' });
+            const response = await axios.get(`${apiHost}/books/export`, { params: filters, responseType: 'blob' });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -191,42 +191,42 @@ const BookList = () => {
 
             </Table>
             <Table striped bordered hover>
-                        {/* Sorting controls */}
-                        <thead>
-                            <tr>
-                            <th onClick={() => handleSort('entryId')}>
+                {/* Sorting controls */}
+                <thead>
+                    <tr>
+                        <th onClick={() => handleSort('entryId')}>
                             Entry ID {sortKey === 'entryId' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
-                                </th>
-                                <th onClick={() => handleSort('title')}>
-                                    Title {sortKey === 'title' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
-                                </th>
-                                <th onClick={() => handleSort('author')}>
-                                    Author {sortKey === 'author' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
-                                </th>
-                                <th onClick={() => handleSort('genre')}>
-                                    Genre {sortKey === 'genre' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
-                                </th>
-                                <th onClick={() => handleSort('isbn')}>
-                                    ISBN {sortKey === 'isbn' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
-                                </th>
-                                <th onClick={() => handleSort('publicationDate')}>
-                                    Publication Date {sortKey === 'publicationDate' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortedBooks.map(book => (
-                                <tr key={book.entryId}>
-                                     <td>{book.entryId}</td>
-                                    <td>{book.title}</td>
-                                    <td>{book.author}</td>
-                                    <td>{book.genre}</td>
-                                    <td>{book.isbn}</td>
-                                    <td>{book.publicationDate}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                        </th>
+                        <th onClick={() => handleSort('title')}>
+                            Title {sortKey === 'title' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                        </th>
+                        <th onClick={() => handleSort('author')}>
+                            Author {sortKey === 'author' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                        </th>
+                        <th onClick={() => handleSort('genre')}>
+                            Genre {sortKey === 'genre' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                        </th>
+                        <th onClick={() => handleSort('isbn')}>
+                            ISBN {sortKey === 'isbn' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                        </th>
+                        <th onClick={() => handleSort('publicationDate')}>
+                            Publication Date {sortKey === 'publicationDate' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sortedBooks.map(book => (
+                        <tr key={book.entryId}>
+                            <td>{book.entryId}</td>
+                            <td>{book.title}</td>
+                            <td>{book.author}</td>
+                            <td>{book.genre}</td>
+                            <td>{book.isbn}</td>
+                            <td>{book.publicationDate}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
             <nav aria-label="Page navigation example">
                 <ul className="pagination">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
