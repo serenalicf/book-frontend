@@ -13,14 +13,13 @@ function App() {
           <Container>
             <Navbar.Brand href="/books">Book Inventory</Navbar.Brand>
             <Nav className="me-auto">
-              <Nav.Link as={Link} to="/books">Book List</Nav.Link>
-              <Nav.Link as={Link} to="/books/create">Create Book</Nav.Link>
+              <Nav.Link as={Link} to="/books/create">Add Book</Nav.Link>
             </Nav>
           </Container>
         </Navbar>
         <Container>
           <Routes>
-            <Route path="/books" element={<BookList />} />
+             <Route path="/books" element={<BookList />} />
             <Route path="/books/create" element={<CreateBookForm />} />
           </Routes>
         </Container>

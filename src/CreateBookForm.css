@@ -9,4 +9,11 @@
 
 .submit-button {
     margin: 10px 0;
+    color: #333; 
+    background-color: #f8f9fa; 
+    border-color: #333; 
+}
+
+.error-message {
+    background-color: rgba(255, 0, 0, 0.1); 
 }

@@ -34,3 +34,47 @@
 .tableContainer td:last-child {
     padding-left: 5px; /* Adjust as needed */
 }
+
+.select-custom {
+    max-width: 50px; /* Set the maximum width of the dropdown */
+}
+
+.select-custom .form-control {
+    width: 100%; /* Make the dropdown full width */
+}
+
+.export-button-cell {
+    width: 50%; /* Set the initial width percentage */
+    max-width: 150px; /* Set a maximum width */
+}
+
+.d-flex {
+    display: flex !important;
+    justify-content: space-between;
+}
+
+.export-button {
+    color: #333; /* Adjust the color to match the header color */
+    background-color: #f8f9fa; /* Adjust the background color to match the header color */
+    border-color: #333; /* Adjust the border color to match the header color */
+}
+
+.btn:hover {
+    color:  #f8f9fa;
+    background-color: #333;
+    /* border-color: var(--bs-btn-hover-border-color); */
+}
+
+
+
+.pagination .page-link {
+    background-color: #f8f9fa; 
+    color: #333; /* Adjust the color to match the header color */
+}
+
+.pagination .page-link:hover {
+    color:  #f8f9fa;
+    background-color: #333;
+
+}
+

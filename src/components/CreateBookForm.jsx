@@ -10,15 +10,12 @@ const CreateBookForm = () => {
     const [isbn, setIsbn] = useState('');
     const [publicationDate, setPublicationDate] = useState('');
     const [message, setMessage] = useState('');
-    const [isbnError, setIsbnError] = useState('');
+    //const [isbnError, setIsbnError] = useState('');
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (isbn.length !== 10 && isbn.length !== 13) {
-            setIsbnError('ISBN must be either 10 or 13 characters long.');
-            return;
-        }
+        setMessage('');
 
         try {
             const response = await axios.post('http://localhost:8083/books', {
@@ -33,17 +30,28 @@ const CreateBookForm = () => {
                 }
             });
 
-            if (response.status === 200) {
+            if (response.status === 201) {
                 setMessage('Book created successfully!');
                 setTitle('');
                 setAuthor('');
                 setGenre('');
                 setIsbn('');
                 setPublicationDate('');
-                setIsbnError('');
             }
         } catch (error) {
-            if (error.response) {
+            if (error.response && error.response.data && error.response.data.errors) {
+                const errorMessages = error.response.data.errors.map(error => {
+                    if (error.fieldName) {
+                        return `${error.fieldName} : ${error.errorMessage}`;
+                    } else {
+                        return error.errorMessage;
+                    }
+                }).join('\n'); // Separate messages by newline character
+
+                setMessage(`Errors:\n${errorMessages}`);
+            
+            
+            } else if (error.response) {
                 setMessage(`Error: ${error.response.data}`);
             } else if (error.request) {
                 setMessage('Error: No response received from the server.');
@@ -56,7 +64,7 @@ const CreateBookForm = () => {
 
     return (
         <div className="form-container" style={{ padding: '20px' }}>
-            <h2>Create Book</h2>
+            <h2>Add Book</h2>
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="title">
                     <Form.Label>Title:</Form.Label>
@@ -64,8 +72,8 @@ const CreateBookForm = () => {
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        required
                         className="form-input"
+                        required
                     />
                 </Form.Group>
                 <Form.Group controlId="author">
@@ -74,8 +82,8 @@ const CreateBookForm = () => {
                         type="text"
                         value={author}
                         onChange={(e) => setAuthor(e.target.value)}
-                        required
                         className="form-input"
+                        required
                     />
                 </Form.Group>
                 <Form.Group controlId="genre">
@@ -84,11 +92,11 @@ const CreateBookForm = () => {
                         type="text"
                         value={genre}
                         onChange={(e) => setGenre(e.target.value)}
-                        required
                         className="form-input"
+                        required
                     />
                 </Form.Group>
-                
+
                 <Form.Group controlId="isbn">
                     <Form.Label>ISBN:</Form.Label>
                     <Form.Control
@@ -96,13 +104,11 @@ const CreateBookForm = () => {
                         value={isbn}
                         onChange={(e) => {
                             setIsbn(e.target.value);
-                            setIsbnError('');
                         }}
-                        isInvalid={!!isbnError}
                         required
                         className="form-input"
                     />
-                    <Form.Control.Feedback type="invalid">{isbnError}</Form.Control.Feedback>
+
                 </Form.Group>
 
                 <Form.Group controlId="publicationDate">
@@ -115,11 +121,19 @@ const CreateBookForm = () => {
                         className="form-input"
                     />
                 </Form.Group>
+
                 <Button variant="primary" type="submit" className="submit-button">
-                    Create Book
+                    Add Book
                 </Button>
             </Form>
-            {message && <Alert variant="success">{message}</Alert>}
+            {message && (
+                <Alert variant={message.includes('Error') ? 'danger' : 'success'} className={message.includes('Error') ? 'error-message' : ''}>
+                    {message.split('\n').map((msg, index) => (
+                        <div key={index}>{msg}</div>
+                    ))}
+                </Alert>
+            )}
+       
         </div>
     );
 };

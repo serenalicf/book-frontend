@@ -7,8 +7,8 @@ import '../BookList.css';
 const BookList = () => {
     const [books, setBooks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [booksPerPage, setBooksPerPage] = useState(10);
-    const availableBooksPerPage = [10, 30, 50]; // Define available options for records per page
+
+    const [totalPages, setTotalPages] = useState(1); // Initialize total pages to 1
 
     const [filters, setFilters] = useState({
         title: '',
@@ -16,15 +16,12 @@ const BookList = () => {
         genre: '',
         isbn: '',
         fromPublicationDate: '',
-        toPublicationDate: ''
+        toPublicationDate: '',
+        pageNo: 0,
+        pageSize: 5
     });
 
-    const handleBooksPerPageChange = (e) => {
-        setBooksPerPage(parseInt(e.target.value, 10));
-        setCurrentPage(1); // Reset to first page when changing records per page
-    };
-
-    const [sortKey, setSortKey] = useState('title');
+    const [sortKey, setSortKey] = useState('entryId');
     const [sortOrder, setSortOrder] = useState('asc');
 
 
@@ -36,6 +33,7 @@ const BookList = () => {
 
             const response = await axios.get('http://localhost:8083/books', { params: filteredParams });
             setBooks(response.data.content);
+            setTotalPages(response.data.totalPages);
             console.log('Response data:', response.data);
         } catch (error) {
             console.error('Error fetching books:', error);
@@ -46,18 +44,19 @@ const BookList = () => {
         const fetchData = async () => {
             await fetchBooks();
         };
-
+    
         fetchData();
+    
+    }, [fetchBooks, filters]);
 
-    }, [fetchBooks]);
-
-    const handlePagination = (pageNumber) => {
-        setCurrentPage(pageNumber);
+    const handlePagination = (page) => {
+        setCurrentPage(page);
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            pageNo: page - 1 // Set the pageNo to the selected page
+        }));
     };
 
-    //const indexOfLastBook = currentPage * booksPerPage;
-    //const indexOfFirstBook = indexOfLastBook - booksPerPage;
-    const currentBooks = Array.isArray(books) ? books.slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage) : [];
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -67,9 +66,15 @@ const BookList = () => {
         }));
     };
 
-    // const handleSearch = () => {
-    //     fetchBooks();
-    // };
+    const handlePageSizeChange = (e) => {
+        const newSize = parseInt(e.target.value, 10);
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            pageSize: newSize,
+            pageNo:0
+        }));
+        setCurrentPage(1);
+    };
 
     const handleExport = async () => {
         try {
@@ -77,7 +82,9 @@ const BookList = () => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'books.csv');
+            const contentDisposition = response.headers["content-disposition"];
+            const fileName = contentDisposition.split('=')[1].trim();
+            link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
         } catch (error) {
@@ -94,7 +101,7 @@ const BookList = () => {
         }
     };
 
-    const sortedBooks = currentBooks.sort((a, b) => {
+    const sortedBooks = books.sort((a, b) => {
         let comparison = 0;
         if (a[sortKey] > b[sortKey]) {
             comparison = 1;
@@ -104,6 +111,7 @@ const BookList = () => {
         return sortOrder === 'asc' ? comparison : -comparison;
     });
 
+    const pageOptions = Array.from({ length: totalPages }, (_, index) => index + 1);
 
     return (
         <div style={{ padding: '20px' }}>
@@ -144,13 +152,13 @@ const BookList = () => {
                                 </div>
                                 <div className="col-md-4">
                                     <Form.Group controlId="fromPublicationDate">
-                                        <Form.Label>From Publication Date:</Form.Label>
+                                        <Form.Label>Publication Date From:</Form.Label>
                                         <Form.Control type="date" name="fromPublicationDate" value={filters.fromPublicationDate} onChange={handleFilterChange} placeholder="From Publication Date" />
                                     </Form.Group>
                                 </div>
                                 <div className="col-md-4">
                                     <Form.Group controlId="toPublicationDate">
-                                        <Form.Label>To Publication Date:</Form.Label>
+                                        <Form.Label>Publication Date To:</Form.Label>
                                         <Form.Control type="date" name="toPublicationDate" value={filters.toPublicationDate} onChange={handleFilterChange} placeholder="To Publication Date" />
                                     </Form.Group>
                                 </div>
@@ -162,24 +170,33 @@ const BookList = () => {
                 </tr>
                 <tr>
                     <td>
-                        <Button onClick={handleExport} className="export-button">Export Books</Button>
-                    </td>
-                    <td>
-                        <Form.Group controlId="booksPerPageSelect">
-                            <Form.Label htmlFor="booksPerPageSelect">View</Form.Label>
-                            <Form.Control as="select" value={booksPerPage} onChange={handleBooksPerPageChange} className="customDropdown" id="booksPerPageSelect">
-                                {availableBooksPerPage.map(option => (
-                                    <option key={option} value={option}>{option}</option>
-                                ))}
-                            </Form.Control>
-                        </Form.Group>
+                        <div className="d-flex flex-wrap align-items-center">
+                            <Button onClick={handleExport} className="export-button mr-2">Export Books</Button>
+                            <Form.Group controlId="booksPerPageSelect" className="mb-0">
+                                <span className="mr-2">View</span>
+                                <Form.Control
+                                    as="select"
+                                    value={filters.pageSize}
+                                    onChange={handlePageSizeChange}
+                                >
+                                    <option value={5}>5</option>
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                </Form.Control>
+                            </Form.Group>
+                        </div>
                     </td>
                 </tr>
-                <tr>
-                    <Table striped bordered hover>
+
+
+            </Table>
+            <Table striped bordered hover>
                         {/* Sorting controls */}
                         <thead>
                             <tr>
+                            <th onClick={() => handleSort('entryId')}>
+                            Entry ID {sortKey === 'entryId' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
+                                </th>
                                 <th onClick={() => handleSort('title')}>
                                     Title {sortKey === 'title' && (sortOrder === 'asc' ? <i className="fas fa-sort-up"></i> : <i className="fas fa-sort-down"></i>)}
                                 </th>
@@ -200,6 +217,7 @@ const BookList = () => {
                         <tbody>
                             {sortedBooks.map(book => (
                                 <tr key={book.entryId}>
+                                     <td>{book.entryId}</td>
                                     <td>{book.title}</td>
                                     <td>{book.author}</td>
                                     <td>{book.genre}</td>
@@ -209,23 +227,27 @@ const BookList = () => {
                             ))}
                         </tbody>
                     </Table>
-                </tr>
-                <tr>
-                    {/* Pagination controls */}
-                    <div>
-                        {books.length > booksPerPage && (
-                            <div>
-                                {Array.from({ length: Math.ceil(books.length / booksPerPage) }, (_, index) => (
-                                    <Button key={index} onClick={() => handlePagination(index + 1)}>
-                                        {index + 1}
-                                    </Button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </tr>
-
-            </Table>
+            <nav aria-label="Page navigation example">
+                <ul className="pagination">
+                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <Button className="page-link" onClick={() => handlePagination(currentPage - 1)} disabled={currentPage === 1}>
+                            Previous
+                        </Button>
+                    </li>
+                    {pageOptions.map((page) => (
+                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                            <Button className="page-link" onClick={() => handlePagination(page)}>
+                                {page}
+                            </Button>
+                        </li>
+                    ))}
+                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <Button className="page-link" onClick={() => handlePagination(currentPage + 1)} disabled={currentPage === totalPages}>
+                            Next
+                        </Button>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
     );
